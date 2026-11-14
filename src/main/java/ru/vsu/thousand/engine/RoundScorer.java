@@ -1,6 +1,7 @@
 package ru.vsu.thousand.engine;
 
 import ru.vsu.thousand.model.Player;
+import ru.vsu.thousand.rules.GameRules;
 
 import java.util.Map;
 import java.util.Objects;
@@ -11,7 +12,7 @@ import java.util.Objects;
 public class RoundScorer {
 
     /**
-     * Подсчитывает очки по результатам заказа и взяток.
+     * Подсчитывает очки по результатам заказа и взяток с учётом барьера 880.
      *
      * @param declarer игрок, сделавший заказ
      * @param contract заказанное количество очков
@@ -32,7 +33,7 @@ public class RoundScorer {
             );
         }
 
-        if (pointsTaken.size() != 3
+        if (pointsTaken.size() != GameRules.PLAYER_COUNT
                 || !pointsTaken.containsKey(declarer)) {
             throw new IllegalArgumentException(
                     "Необходимо передать очки трёх игроков, включая заказчика"
@@ -63,8 +64,12 @@ public class RoundScorer {
         for (Map.Entry<Player, Integer> entry : pointsTaken.entrySet()) {
             Player player = entry.getKey();
 
-            if (player != declarer && player.getScore() < 880) {
-                player.addScore(entry.getValue());
+            if (player != declarer && player.getScore() < GameRules.BARRIER_SCORE) {
+                int allowedAddition = Math.min(
+                        entry.getValue(),
+                        GameRules.BARRIER_SCORE - player.getScore()
+                );
+                player.addScore(allowedAddition);
             }
         }
 

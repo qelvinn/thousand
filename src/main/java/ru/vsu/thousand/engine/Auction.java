@@ -17,19 +17,39 @@ public class Auction {
     private boolean finished;
 
     /**
-     * Создаёт торговлю для трёх игроков.
+     * Создаёт торговлю с первым игроком в списке.
      *
      * @param players участники партии
      */
     public Auction(List<Player> players) {
+        this(players, 0);
+    }
+
+    /**
+     * Создаёт торговлю с указанным первым игроком.
+     *
+     * @param players участники партии
+     * @param startingPlayerIndex индекс первого игрока
+     */
+    public Auction(List<Player> players, int startingPlayerIndex) {
         Objects.requireNonNull(players);
 
-        if (players.size() != 3 || players.stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Для торговли нужны три игрока");
+        if (players.size() != 3
+                || players.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException(
+                    "Для торговли нужны три игрока"
+            );
+        }
+
+        if (startingPlayerIndex < 0
+                || startingPlayerIndex >= players.size()) {
+            throw new IllegalArgumentException(
+                    "Некорректный индекс первого игрока"
+            );
         }
 
         this.players = List.copyOf(players);
-        this.currentPlayerIndex = 0;
+        this.currentPlayerIndex = startingPlayerIndex;
         this.highestBid = null;
         this.consecutivePasses = 0;
         this.finished = false;
@@ -39,17 +59,18 @@ public class Auction {
      * Принимает ставку текущего игрока.
      *
      * @param points размер ставки
-     * @throws IllegalStateException если торговля завершена
-     * @throws IllegalArgumentException если ставка недостаточно высока
      */
     public void makeBid(int points) {
         ensureActive();
 
-        int minimumBid = highestBid == null ? 100 : highestBid.getPoints() + 5;
+        int minimumBid = highestBid == null
+                ? 100
+                : highestBid.getPoints() + 5;
 
         if (points < minimumBid || points % 5 != 0) {
             throw new IllegalArgumentException(
-                    "Ставка должна быть не меньше " + minimumBid + " и кратна 5"
+                    "Ставка должна быть не меньше "
+                            + minimumBid + " и кратна 5"
             );
         }
 
@@ -58,11 +79,7 @@ public class Auction {
         moveToNextPlayer();
     }
 
-    /**
-     * Фиксирует пас текущего игрока.
-     *
-     * @throws IllegalStateException если торговля завершена
-     */
+    /** Фиксирует пас текущего игрока. */
     public void pass() {
         ensureActive();
 
@@ -75,49 +92,38 @@ public class Auction {
         }
     }
 
-    /**
-     * Возвращает текущего игрока.
-     *
-     * @return игрок, который должен сделать ход
-     */
+    /** @return текущий игрок */
     public Player getCurrentPlayer() {
         return players.get(currentPlayerIndex);
     }
 
-    /**
-     * Возвращает наибольшую ставку.
-     *
-     * @return наибольшая ставка или null, если ставок ещё не было
-     */
+    /** @return наибольшая ставка или null */
     public Bid getHighestBid() {
         return highestBid;
     }
 
-    /**
-     * Возвращает победителя торговли.
-     *
-     * @return игрок, предложивший наибольшую ставку, или null, если все спасовали
-     */
+    /** @return победитель торговли или null */
     public Player getWinner() {
-        return highestBid == null ? null : highestBid.getPlayer();
+        return highestBid == null
+                ? null
+                : highestBid.getPlayer();
     }
 
-    /**
-     * Проверяет, завершена ли торговля.
-     *
-     * @return true, если торговля завершена
-     */
+    /** @return true, если торговля завершена */
     public boolean isFinished() {
         return finished;
     }
 
     private void moveToNextPlayer() {
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        currentPlayerIndex =
+                (currentPlayerIndex + 1) % players.size();
     }
 
     private void ensureActive() {
         if (finished) {
-            throw new IllegalStateException("Торговля уже завершена");
+            throw new IllegalStateException(
+                    "Торговля уже завершена"
+            );
         }
     }
 }

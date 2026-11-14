@@ -1,5 +1,7 @@
 package ru.vsu.thousand.model;
 
+import ru.vsu.thousand.rules.GameRules;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -112,7 +114,7 @@ public class Player {
     }
 
     /**
-     * Фиксирует выполненный или невыполненный заказ.
+     * Фиксирует выполненный или невыполненный заказ, начисляет болты и штраф за три болта.
      *
      * @param successful true, если заказ выполнен
      */
@@ -121,9 +123,13 @@ public class Player {
             consecutiveFailedContracts = 0;
         } else {
             consecutiveFailedContracts++;
-            if (consecutiveFailedContracts == 3) {
+            if (consecutiveFailedContracts == GameRules.FAILED_CONTRACTS_FOR_BOLT) {
                 bolts++;
                 consecutiveFailedContracts = 0;
+                if (bolts == GameRules.BOLTS_FOR_PENALTY) {
+                    score -= GameRules.BOLT_PENALTY_POINTS;
+                    bolts = 0;
+                }
             }
         }
     }

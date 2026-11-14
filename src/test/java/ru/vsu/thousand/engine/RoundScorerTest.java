@@ -149,4 +149,40 @@ class RoundScorerTest {
                 () -> new RoundScorer().scoreRound(declarer, 100, null)
         );
     }
+
+    @Test
+    void playerBelow880CannotExceed880WithoutContract() {
+        Player declarer = new Player("Заказчик");
+        Player second = new Player("Второй");
+        Player third = new Player("Третий");
+
+        second.addScore(860);
+
+        new RoundScorer().scoreRound(
+                declarer, 100,
+                Map.of(declarer, 100, second, 50, third, 50)
+        );
+
+        assertEquals(880, second.getScore());
+        assertEquals(50, third.getScore());
+    }
+
+    @Test
+    void thirdBoltDeducts120PointsAndResetsBolts() {
+        Player declarer = new Player("Заказчик");
+        RoundScorer scorer = new RoundScorer();
+
+        for (int i = 0; i < 9; i++) {
+            scorer.scoreRound(
+                    declarer, 100,
+                    Map.of(declarer, 0,
+                            new Player("Второй"), 100,
+                            new Player("Третий"), 100)
+            );
+        }
+
+        assertEquals(-1020, declarer.getScore());
+        assertEquals(0, declarer.getBolts());
+        assertEquals(0, declarer.getConsecutiveFailedContracts());
+    }
 }

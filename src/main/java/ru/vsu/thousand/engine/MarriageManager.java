@@ -31,7 +31,7 @@ public class MarriageManager {
      * Объявляет марьяж указанной масти.
      *
      * @param player игрок, объявляющий марьяж
-     * @param suit масть короля и дамы
+     * @param suit масть марьяжа
      * @return количество начисляемых очков
      */
     public int declare(Player player, Suit suit) {
@@ -39,11 +39,15 @@ public class MarriageManager {
         Objects.requireNonNull(suit);
 
         if (declaredMarriages.contains(suit)) {
-            throw new IllegalStateException("Марьяж этой масти уже объявлен");
+            throw new IllegalStateException(
+                    "Марьяж этой масти уже объявлен"
+            );
         }
 
-        boolean hasKing = player.getHand().contains(new Card(suit, Rank.KING));
-        boolean hasQueen = player.getHand().contains(new Card(suit, Rank.QUEEN));
+        boolean hasKing = player.getHand()
+                .contains(new Card(suit, Rank.KING));
+        boolean hasQueen = player.getHand()
+                .contains(new Card(suit, Rank.QUEEN));
 
         if (!hasKing || !hasQueen) {
             throw new IllegalArgumentException(
@@ -58,12 +62,17 @@ public class MarriageManager {
     }
 
     /**
-     * Проверяет, объявлялся ли марьяж указанной масти.
+     * Проверяет, объявлялся ли марьяж этой масти в текущем раунде.
      *
      * @param suit проверяемая масть
      * @return true, если марьяж уже объявлен
      */
     public boolean isDeclared(Suit suit) {
         return declaredMarriages.contains(Objects.requireNonNull(suit));
+    }
+
+    /** Сбрасывает объявленные марьяжи перед новым раундом. */
+    public void reset() {
+        declaredMarriages.clear();
     }
 }
