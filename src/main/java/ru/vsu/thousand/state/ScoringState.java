@@ -10,6 +10,11 @@ import java.util.Map;
  */
 public class ScoringState implements GameState {
 
+    /**
+     * Подсчитывает очки за раунд и переводит партию в финальное состояние или в следующий раунд.
+     *
+     * @param gameEngine игровой движок
+     */
     @Override
     public void handle(GameEngine gameEngine) {
         Player declarer = gameEngine.getDeclarer();
@@ -52,6 +57,11 @@ public class ScoringState implements GameState {
         }
     }
 
+    /**
+     * Возвращает фазу подсчёта очков.
+     *
+     * @return фаза подсчёта очков
+     */
     @Override
     public GamePhase getPhase() {
         return GamePhase.SCORING;

@@ -8,6 +8,11 @@ import ru.vsu.thousand.engine.GameEngine;
  */
 public class DealingState implements GameState {
 
+    /**
+     * Очищает данные прошлого раунда, раздаёт карты игрокам и открывает торговлю.
+     *
+     * @param gameEngine игровой движок
+     */
     @Override
     public void handle(GameEngine gameEngine) {
         gameEngine.getPlayers().forEach(player -> player.clearHand());
@@ -32,6 +37,11 @@ public class DealingState implements GameState {
         gameEngine.setState(new BiddingState());
     }
 
+    /**
+     * Возвращает фазу раздачи карт.
+     *
+     * @return фаза раздачи
+     */
     @Override
     public GamePhase getPhase() {
         return GamePhase.DEALING;

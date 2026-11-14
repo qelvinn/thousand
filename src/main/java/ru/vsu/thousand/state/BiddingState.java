@@ -9,6 +9,11 @@ import ru.vsu.thousand.model.Player;
  */
 public class BiddingState implements GameState {
 
+    /**
+     * Выполняет очередной шаг торговли или завершает её с передачей прикупа победителю.
+     *
+     * @param gameEngine игровой движок
+     */
     @Override
     public void handle(GameEngine gameEngine) {
         if (gameEngine.getAuction().isFinished()) {
@@ -46,6 +51,11 @@ public class BiddingState implements GameState {
         }
     }
 
+    /**
+     * Возвращает фазу торговли.
+     *
+     * @return фаза торговли
+     */
     @Override
     public GamePhase getPhase() {
         return GamePhase.BIDDING;

@@ -9,6 +9,8 @@ import ru.vsu.thousand.model.Suit;
 import ru.vsu.thousand.rules.GameRules;
 import ru.vsu.thousand.util.CardComparators;
 
+import java.util.List;
+
 /**
  * Управляет розыгрышем семи взяток.
  */
@@ -32,7 +34,7 @@ public class PlayingState implements GameState {
 
             for (int turn = 0; turn < GameRules.PLAYER_COUNT; turn++) {
                 Player current = trick.getCurrentPlayer();
-                Card card = chooseCard(current, trick);
+                Card card = chooseCard(current, trick, trickNumber, gameEngine);
 
                 if (trickNumber > 1
                         && trick.getPlayedCards().isEmpty()
@@ -40,12 +42,8 @@ public class PlayingState implements GameState {
                         || card.getRank() == Rank.QUEEN)) {
 
                     Suit suit = card.getSuit();
-                    boolean hasKing = current.getHand()
-                            .contains(new Card(suit, Rank.KING));
-                    boolean hasQueen = current.getHand()
-                            .contains(new Card(suit, Rank.QUEEN));
 
-                    if (hasKing && hasQueen
+                    if (hasMarriage(current, suit)
                             && !gameEngine.getMarriageManager().isDeclared(suit)) {
                         int points = gameEngine.getMarriageManager()
                                 .declare(current, suit);
@@ -89,12 +87,26 @@ public class PlayingState implements GameState {
         gameEngine.setState(new ScoringState());
     }
 
-    private Card chooseCard(Player player, Trick trick) {
-        var hand = player.getHand().stream()
+    private Card chooseCard(
+            Player player,
+            Trick trick,
+            int trickNumber,
+            GameEngine gameEngine
+    ) {
+        List<Card> hand = player.getHand().stream()
                 .sorted(CardComparators.BY_RANK_THEN_SUIT)
                 .toList();
 
         if (trick.getPlayedCards().isEmpty()) {
+            if (trickNumber > 1) {
+                for (Card card : hand) {
+                    if ((card.getRank() == Rank.QUEEN || card.getRank() == Rank.KING)
+                            && hasMarriage(player, card.getSuit())
+                            && !gameEngine.getMarriageManager().isDeclared(card.getSuit())) {
+                        return card;
+                    }
+                }
+            }
             return hand.get(hand.size() - 1);
         }
 
@@ -110,7 +122,17 @@ public class PlayingState implements GameState {
         return hand.get(0);
     }
 
-    /** @return фаза розыгрыша взяток */
+    private boolean hasMarriage(Player player, Suit suit) {
+        boolean hasKing = player.getHand().contains(new Card(suit, Rank.KING));
+        boolean hasQueen = player.getHand().contains(new Card(suit, Rank.QUEEN));
+        return hasKing && hasQueen;
+    }
+
+    /**
+     * Возвращает фазу розыгрыша взяток.
+     *
+     * @return фаза розыгрыша
+     */
     @Override
     public GamePhase getPhase() {
         return GamePhase.PLAYING;

@@ -13,6 +13,11 @@ import java.util.List;
  */
 public class DiscardingState implements GameState {
 
+    /**
+     * Сносит три младшие карты из руки заказчика после получения прикупа.
+     *
+     * @param gameEngine игровой движок
+     */
     @Override
     public void handle(GameEngine gameEngine) {
         Player declarer = gameEngine.getDeclarer();
@@ -33,6 +38,11 @@ public class DiscardingState implements GameState {
         gameEngine.setState(new PlayingState());
     }
 
+    /**
+     * Возвращает фазу сноса карт.
+     *
+     * @return фаза сноса
+     */
     @Override
     public GamePhase getPhase() {
         return GamePhase.DISCARDING;

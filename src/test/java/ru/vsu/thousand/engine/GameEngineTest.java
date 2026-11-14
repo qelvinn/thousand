@@ -47,6 +47,18 @@ class GameEngineTest {
     }
 
     @Test
+    void shouldDeclareMarriagesDuringGameSimulation() {
+        GameEngine engine = new GameEngine(createPlayers(), 12345L);
+
+        engine.runUntilFinished(10000);
+
+        boolean hasMarriageEvent = engine.getEvents().stream()
+                .anyMatch(event -> event.contains("объявил марьяж"));
+
+        assertTrue(hasMarriageEvent);
+    }
+
+    @Test
     void shouldRejectInvalidStepLimit() {
         GameEngine engine = new GameEngine(createPlayers(), 12345L);
 
