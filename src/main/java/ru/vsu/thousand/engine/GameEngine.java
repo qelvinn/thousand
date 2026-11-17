@@ -2,19 +2,29 @@ package ru.vsu.thousand.engine;
 
 import ru.vsu.thousand.events.GameLog;
 import ru.vsu.thousand.model.Card;
+import ru.vsu.thousand.model.Deck;
 import ru.vsu.thousand.model.GameSettings;
 import ru.vsu.thousand.model.Player;
 import ru.vsu.thousand.model.TrumpSuit;
 import ru.vsu.thousand.rules.GameRules;
+import ru.vsu.thousand.state.BiddingState;
+import ru.vsu.thousand.state.DealingState;
+import ru.vsu.thousand.state.DiscardingState;
+import ru.vsu.thousand.state.FinishedState;
 import ru.vsu.thousand.state.GamePhase;
 import ru.vsu.thousand.state.GameState;
 import ru.vsu.thousand.state.InitializationState;
+import ru.vsu.thousand.state.PlayingState;
+import ru.vsu.thousand.state.ScoringState;
+import ru.vsu.thousand.storage.GameSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Управляет ходом партии в игре «Тысяча».
@@ -322,8 +332,148 @@ public class GameEngine {
         return roundNumber % players.size();
     }
 
+    /**
+     * Возвращает номер текущего раунда.
+     *
+     * @return номер раунда
+     */
+    public int getRoundNumber() {
+        return roundNumber;
+    }
+
     /** Увеличивает номер раунда. */
     public void advanceRound() {
         roundNumber++;
+    }
+
+    /**
+     * Создаёт полный снимок текущего состояния партии.
+     *
+     * @return снимок состояния партии
+     */
+    public GameSnapshot createSnapshot() {
+        List<GameSnapshot.CardSnapshot> talonSnapshots = talon.stream()
+                .map(card -> new GameSnapshot.CardSnapshot(card.getSuit(), card.getRank()))
+                .toList();
+
+        List<GameSnapshot.PlayerSnapshot> playerSnapshots = players.stream()
+                .map(player -> new GameSnapshot.PlayerSnapshot(
+                        player.getName(),
+                        player.getScore(),
+                        player.getConsecutiveFailedContracts(),
+                        player.getBolts(),
+                        player.getHand().stream()
+                                .map(card -> new GameSnapshot.CardSnapshot(card.getSuit(), card.getRank()))
+                                .toList()
+                ))
+                .toList();
+
+        Map<String, Integer> roundPointsByName = new LinkedHashMap<>();
+        for (Player player : players) {
+            roundPointsByName.put(player.getName(), roundPoints.getOrDefault(player, 0));
+        }
+
+        return new GameSnapshot(
+                settings.getSeed(),
+                roundNumber,
+                getPhase(),
+                trumpSuit.getSuit().orElse(null),
+                List.copyOf(marriageManager.getDeclaredMarriages()),
+                declarer != null ? declarer.getName() : null,
+                contract,
+                declarerPoints,
+                talonSnapshots,
+                playerSnapshots,
+                roundPointsByName,
+                gameLog.getEntries()
+        );
+    }
+
+    /**
+     * Восстанавливает игровой движок из сохранённого снимка состояния.
+     *
+     * @param snapshot снимок состояния партии
+     * @return восстановленный экземпляр игрового движка
+     */
+    public static GameEngine fromSnapshot(GameSnapshot snapshot) {
+        Objects.requireNonNull(snapshot, "Снимок состояния не может быть null");
+        if (snapshot.players().size() != GameRules.PLAYER_COUNT) {
+            throw new IllegalArgumentException("В снимке должно быть три игрока");
+        }
+
+        List<Player> restoredPlayers = new ArrayList<>();
+        for (GameSnapshot.PlayerSnapshot playerSnapshot : snapshot.players()) {
+            Player player = new Player(playerSnapshot.name());
+            List<Card> restoredHand = playerSnapshot.hand().stream()
+                    .map(card -> new Card(card.suit(), card.rank()))
+                    .toList();
+            player.restoreState(
+                    playerSnapshot.score(),
+                    playerSnapshot.consecutiveFailedContracts(),
+                    playerSnapshot.bolts(),
+                    restoredHand
+            );
+            restoredPlayers.add(player);
+        }
+
+        GameEngine engine = new GameEngine(restoredPlayers, snapshot.seed());
+        engine.roundNumber = snapshot.roundNumber();
+
+        for (int i = 0; i < snapshot.roundNumber(); i++) {
+            new Deck(engine.settings.getRandom());
+        }
+
+        if (snapshot.trumpSuit() != null) {
+            engine.trumpSuit.setSuit(snapshot.trumpSuit());
+        }
+        engine.marriageManager.restoreDeclared(new HashSet<>(snapshot.declaredMarriages()));
+
+        List<Card> restoredTalon = snapshot.talon().stream()
+                .map(card -> new Card(card.suit(), card.rank()))
+                .toList();
+        engine.setTalon(restoredTalon);
+
+        Map<String, Player> playersByName = restoredPlayers.stream()
+                .collect(Collectors.toMap(Player::getName, player -> player));
+
+        if (snapshot.declarerName() != null) {
+            Player foundDeclarer = playersByName.get(snapshot.declarerName());
+            if (foundDeclarer == null) {
+                throw new IllegalArgumentException("Заказчик из снимка не найден среди игроков");
+            }
+            engine.declarer = foundDeclarer;
+        }
+
+        engine.contract = snapshot.contract();
+        engine.declarerPoints = snapshot.declarerPoints();
+
+        for (Player player : restoredPlayers) {
+            int pts = snapshot.roundPoints().getOrDefault(player.getName(), 0);
+            engine.roundPoints.put(player, pts);
+        }
+
+        engine.gameLog.restore(snapshot.events());
+        engine.currentState = createStateForPhase(snapshot.phase());
+
+        if (snapshot.phase() == GamePhase.BIDDING) {
+            int startIdx = snapshot.roundNumber() > 0
+                    ? (snapshot.roundNumber() - 1) % restoredPlayers.size()
+                    : 0;
+            engine.auction = new Auction(restoredPlayers, startIdx);
+        }
+
+        return engine;
+    }
+
+    private static GameState createStateForPhase(GamePhase phase) {
+        return switch (phase) {
+            case INITIALIZATION -> new InitializationState();
+            case DEALING -> new DealingState();
+            case BIDDING -> new BiddingState();
+            case DISCARDING -> new DiscardingState();
+            case PLAYING -> new PlayingState();
+            case SCORING -> new ScoringState();
+            case FINISHED -> new FinishedState();
+        };
     }
 }

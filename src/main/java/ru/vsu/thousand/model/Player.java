@@ -133,4 +133,31 @@ public class Player {
             }
         }
     }
+
+    /**
+     * Восстанавливает состояние игрока из сохранённых данных.
+     *
+     * @param score общий счёт игрока
+     * @param consecutiveFailedContracts количество подряд невыполненных заказов
+     * @param bolts количество болтов
+     * @param cards карты на руке игрока
+     */
+    public void restoreState(
+            int score,
+            int consecutiveFailedContracts,
+            int bolts,
+            List<Card> cards
+    ) {
+        Objects.requireNonNull(cards, "Список карт не может быть null");
+        if (consecutiveFailedContracts < 0 || bolts < 0) {
+            throw new IllegalArgumentException("Счётчики штрафов не могут быть отрицательными");
+        }
+        this.score = score;
+        this.consecutiveFailedContracts = consecutiveFailedContracts;
+        this.bolts = bolts;
+        this.hand.clear();
+        for (Card card : cards) {
+            this.hand.add(Objects.requireNonNull(card));
+        }
+    }
 }

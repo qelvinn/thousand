@@ -71,6 +71,28 @@ public class MarriageManager {
         return declaredMarriages.contains(Objects.requireNonNull(suit));
     }
 
+    /**
+     * Возвращает неизменяемое множество объявленных в текущем раунде марьяжей.
+     *
+     * @return множество мастей объявленных марьяжей
+     */
+    public Set<Suit> getDeclaredMarriages() {
+        return Set.copyOf(declaredMarriages);
+    }
+
+    /**
+     * Восстанавливает список объявленных марьяжей из сохранённого состояния.
+     *
+     * @param suits множество мастей объявленных марьяжей
+     */
+    public void restoreDeclared(Set<Suit> suits) {
+        Objects.requireNonNull(suits, "Множество мастей не может быть null");
+        declaredMarriages.clear();
+        for (Suit suit : suits) {
+            declaredMarriages.add(Objects.requireNonNull(suit));
+        }
+    }
+
     /** Сбрасывает объявленные марьяжи перед новым раундом. */
     public void reset() {
         declaredMarriages.clear();

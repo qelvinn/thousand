@@ -2,6 +2,7 @@ package ru.vsu.thousand.events;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Хранит журнал событий игровой партии.
@@ -29,6 +30,19 @@ public class GameLog {
      */
     public List<String> getEntries() {
         return List.copyOf(entries);
+    }
+
+    /**
+     * Восстанавливает записи журнала из сохранённого списка.
+     *
+     * @param savedEntries сохранённые записи журнала
+     */
+    public void restore(List<String> savedEntries) {
+        Objects.requireNonNull(savedEntries, "Список событий не может быть null");
+        entries.clear();
+        for (String entry : savedEntries) {
+            add(entry);
+        }
     }
 
     /**
