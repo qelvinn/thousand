@@ -4,6 +4,8 @@ import ru.vsu.thousand.engine.GameEngine;
 import ru.vsu.thousand.model.Bid;
 import ru.vsu.thousand.model.Player;
 
+import java.util.OptionalInt;
+
 /**
  * Управляет фазой торговли за прикуп.
  */
@@ -41,10 +43,15 @@ public class BiddingState implements GameState {
         }
 
         Player player = gameEngine.getAuction().getCurrentPlayer();
+        Bid highestBid = gameEngine.getAuction().getHighestBid();
+        int currentHighest = highestBid == null ? 0 : highestBid.getPoints();
 
-        if (gameEngine.getAuction().getHighestBid() == null) {
-            gameEngine.getAuction().makeBid(100);
-            gameEngine.addEvent(player.getName() + " сделал заказ 100");
+        OptionalInt decision = gameEngine.getStrategy(player).chooseBid(player, currentHighest);
+
+        if (decision.isPresent()) {
+            int bidPoints = decision.getAsInt();
+            gameEngine.getAuction().makeBid(bidPoints);
+            gameEngine.addEvent(player.getName() + " сделал заказ " + bidPoints);
         } else {
             gameEngine.getAuction().pass();
             gameEngine.addEvent(player.getName() + " спасовал");

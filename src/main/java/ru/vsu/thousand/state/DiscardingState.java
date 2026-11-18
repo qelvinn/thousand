@@ -3,9 +3,7 @@ package ru.vsu.thousand.state;
 import ru.vsu.thousand.engine.GameEngine;
 import ru.vsu.thousand.model.Card;
 import ru.vsu.thousand.model.Player;
-import ru.vsu.thousand.util.CardComparators;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,7 +12,7 @@ import java.util.List;
 public class DiscardingState implements GameState {
 
     /**
-     * Сносит три младшие карты из руки заказчика после получения прикупа.
+     * Передаёт выбор трёх карт для сноса стратегии заказчика.
      *
      * @param gameEngine игровой движок
      */
@@ -22,12 +20,8 @@ public class DiscardingState implements GameState {
     public void handle(GameEngine gameEngine) {
         Player declarer = gameEngine.getDeclarer();
 
-        List<Card> cards = new ArrayList<>(declarer.getHand());
-        cards.sort(CardComparators.BY_RANK_THEN_SUIT);
-
-        List<Card> discarded = new ArrayList<>(
-                cards.subList(0, 3)
-        );
+        List<Card> discarded = gameEngine.getStrategy(declarer)
+                .chooseDiscard(declarer, gameEngine.getContract());
 
         gameEngine.getTalonExchange().discard(declarer, discarded);
 

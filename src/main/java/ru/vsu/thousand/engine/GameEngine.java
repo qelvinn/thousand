@@ -1,5 +1,7 @@
 package ru.vsu.thousand.engine;
 
+import ru.vsu.thousand.bot.DefaultBotStrategy;
+import ru.vsu.thousand.bot.PlayerStrategy;
 import ru.vsu.thousand.events.GameLog;
 import ru.vsu.thousand.model.Card;
 import ru.vsu.thousand.model.Deck;
@@ -39,6 +41,7 @@ public class GameEngine {
     private final RoundScorer roundScorer;
     private final GameLog gameLog;
     private final Map<Player, Integer> roundPoints;
+    private final Map<Player, PlayerStrategy> strategies;
 
     private GameState currentState;
     private List<Card> talon;
@@ -49,13 +52,29 @@ public class GameEngine {
     private int roundNumber;
 
     /**
-     * Создаёт игровой движок.
+     * Создаёт игровой движок со стратегией по умолчанию для всех игроков.
      *
      * @param players три участника партии
      * @param seed начальное значение генератора случайных чисел
      */
     public GameEngine(List<Player> players, long seed) {
+        this(players, seed, Map.of());
+    }
+
+    /**
+     * Создаёт игровой движок с заданными стратегиями игроков.
+     *
+     * @param players три участника партии
+     * @param seed начальное значение генератора случайных чисел
+     * @param customStrategies карта стратегий для игроков
+     */
+    public GameEngine(
+            List<Player> players,
+            long seed,
+            Map<Player, PlayerStrategy> customStrategies
+    ) {
         Objects.requireNonNull(players);
+        Objects.requireNonNull(customStrategies);
 
         if (players.size() != GameRules.PLAYER_COUNT
                 || players.stream().anyMatch(Objects::isNull)
@@ -74,11 +93,15 @@ public class GameEngine {
         this.roundScorer = new RoundScorer();
         this.gameLog = new GameLog();
         this.roundPoints = new LinkedHashMap<>();
+        this.strategies = new LinkedHashMap<>();
         this.talon = List.of();
         this.contract = 0;
 
+        PlayerStrategy defaultStrategy = new DefaultBotStrategy();
         for (Player player : players) {
             roundPoints.put(player, 0);
+            PlayerStrategy assigned = customStrategies.getOrDefault(player, defaultStrategy);
+            strategies.put(player, Objects.requireNonNull(assigned));
         }
     }
 
@@ -130,6 +153,21 @@ public class GameEngine {
     /** @return участники партии */
     public List<Player> getPlayers() {
         return List.copyOf(players);
+    }
+
+    /**
+     * Возвращает стратегию принятия решений указанного игрока.
+     *
+     * @param player участник партии
+     * @return стратегия игрока
+     */
+    public PlayerStrategy getStrategy(Player player) {
+        Objects.requireNonNull(player);
+        PlayerStrategy strategy = strategies.get(player);
+        if (strategy == null) {
+            throw new IllegalArgumentException("Игрок не участвует в партии");
+        }
+        return strategy;
     }
 
     /** @return настройки партии */
