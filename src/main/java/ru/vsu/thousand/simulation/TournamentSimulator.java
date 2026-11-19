@@ -138,6 +138,7 @@ public class TournamentSimulator {
         int steps = 0;
         while (engine.getPhase() != GamePhase.FINISHED && steps < MAX_STEPS_PER_GAME) {
             GamePhase phaseBeforeStep = engine.getPhase();
+            int eventsBeforeStep = engine.getEvents().size();
             engine.runStep();
             steps++;
 
@@ -145,8 +146,9 @@ public class TournamentSimulator {
                 pendingDeclarerName = engine.getDeclarer().getName();
                 pendingContract = engine.getContract();
             } else if (phaseBeforeStep == GamePhase.SCORING && pendingDeclarerName != null) {
-                boolean successful = engine.getEvents().get(engine.getEvents().size() - 4)
-                        .equals("Заказ выполнен");
+                List<String> scoringEvents = engine.getEvents()
+                        .subList(eventsBeforeStep, engine.getEvents().size());
+                boolean successful = scoringEvents.contains("Заказ выполнен");
                 contracts.add(new ContractStatistics.ContractRecord(
                         pendingDeclarerName,
                         pendingContract,

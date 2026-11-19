@@ -92,6 +92,45 @@ public class Auction {
         }
     }
 
+    /**
+     * Восстанавливает внутреннее состояние торговли из сохранённого снимка.
+     *
+     * @param currentPlayerIndex индекс текущего игрока
+     * @param highestBid текущая максимальная ставка или null
+     * @param consecutivePasses количество подряд идущих пасов
+     * @param finished признак завершения торговли
+     */
+    public void restoreState(
+            int currentPlayerIndex,
+            Bid highestBid,
+            int consecutivePasses,
+            boolean finished
+    ) {
+        if (currentPlayerIndex < 0 || currentPlayerIndex >= players.size()) {
+            throw new IllegalArgumentException("Некорректный индекс текущего игрока");
+        }
+        if (consecutivePasses < 0) {
+            throw new IllegalArgumentException("Количество пасов не может быть отрицательным");
+        }
+        if (highestBid != null && !players.contains(highestBid.getPlayer())) {
+            throw new IllegalArgumentException("Автор ставки должен участвовать в торговле");
+        }
+        this.currentPlayerIndex = currentPlayerIndex;
+        this.highestBid = highestBid;
+        this.consecutivePasses = consecutivePasses;
+        this.finished = finished;
+    }
+
+    /** @return индекс текущего игрока */
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
+    /** @return количество пасов подряд */
+    public int getConsecutivePasses() {
+        return consecutivePasses;
+    }
+
     /** @return текущий игрок */
     public Player getCurrentPlayer() {
         return players.get(currentPlayerIndex);

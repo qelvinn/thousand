@@ -3,6 +3,7 @@ package ru.vsu.thousand.engine;
 import ru.vsu.thousand.bot.DefaultBotStrategy;
 import ru.vsu.thousand.bot.PlayerStrategy;
 import ru.vsu.thousand.events.GameLog;
+import ru.vsu.thousand.model.Bid;
 import ru.vsu.thousand.model.Card;
 import ru.vsu.thousand.model.Deck;
 import ru.vsu.thousand.model.GameSettings;
@@ -26,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -411,6 +413,18 @@ public class GameEngine {
             roundPointsByName.put(player.getName(), roundPoints.getOrDefault(player, 0));
         }
 
+        GameSnapshot.AuctionSnapshot auctionSnapshot = null;
+        if (auction != null) {
+            Bid highest = auction.getHighestBid();
+            auctionSnapshot = new GameSnapshot.AuctionSnapshot(
+                    auction.getCurrentPlayerIndex(),
+                    highest != null ? highest.getPlayer().getName() : null,
+                    highest != null ? highest.getPoints() : 0,
+                    auction.getConsecutivePasses(),
+                    auction.isFinished()
+            );
+        }
+
         return new GameSnapshot(
                 settings.getSeed(),
                 roundNumber,
@@ -423,23 +437,40 @@ public class GameEngine {
                 talonSnapshots,
                 playerSnapshots,
                 roundPointsByName,
+                auctionSnapshot,
                 gameLog.getEntries()
         );
     }
 
     /**
-     * Восстанавливает игровой движок из сохранённого снимка состояния.
+     * Восстанавливает игровой движок из сохранённого снимка состояния со стратегиями по умолчанию.
      *
      * @param snapshot снимок состояния партии
      * @return восстановленный экземпляр игрового движка
      */
     public static GameEngine fromSnapshot(GameSnapshot snapshot) {
+        return fromSnapshot(snapshot, player -> new DefaultBotStrategy());
+    }
+
+    /**
+     * Восстанавливает игровой движок из сохранённого снимка состояния с пользовательскими стратегиями.
+     *
+     * @param snapshot снимок состояния партии
+     * @param strategyResolver функция получения стратегии по восстановленному игроку
+     * @return восстановленный экземпляр игрового движка
+     */
+    public static GameEngine fromSnapshot(
+            GameSnapshot snapshot,
+            Function<Player, PlayerStrategy> strategyResolver
+    ) {
         Objects.requireNonNull(snapshot, "Снимок состояния не может быть null");
+        Objects.requireNonNull(strategyResolver, "Функция выбора стратегии не может быть null");
         if (snapshot.players().size() != GameRules.PLAYER_COUNT) {
             throw new IllegalArgumentException("В снимке должно быть три игрока");
         }
 
         List<Player> restoredPlayers = new ArrayList<>();
+        Map<Player, PlayerStrategy> restoredStrategies = new LinkedHashMap<>();
         for (GameSnapshot.PlayerSnapshot playerSnapshot : snapshot.players()) {
             Player player = new Player(playerSnapshot.name());
             List<Card> restoredHand = playerSnapshot.hand().stream()
@@ -452,9 +483,10 @@ public class GameEngine {
                     restoredHand
             );
             restoredPlayers.add(player);
+            restoredStrategies.put(player, Objects.requireNonNull(strategyResolver.apply(player)));
         }
 
-        GameEngine engine = new GameEngine(restoredPlayers, snapshot.seed());
+        GameEngine engine = new GameEngine(restoredPlayers, snapshot.seed(), restoredStrategies);
         engine.roundNumber = snapshot.roundNumber();
 
         for (int i = 0; i < snapshot.roundNumber(); i++) {
@@ -493,7 +525,25 @@ public class GameEngine {
         engine.gameLog.restore(snapshot.events());
         engine.currentState = createStateForPhase(snapshot.phase());
 
-        if (snapshot.phase() == GamePhase.BIDDING) {
+        if (snapshot.auction() != null) {
+            GameSnapshot.AuctionSnapshot auctionSnapshot = snapshot.auction();
+            Auction restoredAuction = new Auction(restoredPlayers, auctionSnapshot.currentPlayerIndex());
+            Bid restoredHighestBid = null;
+            if (auctionSnapshot.highestBidderName() != null) {
+                Player bidder = playersByName.get(auctionSnapshot.highestBidderName());
+                if (bidder == null) {
+                    throw new IllegalArgumentException("Автор ставки из снимка не найден среди игроков");
+                }
+                restoredHighestBid = new Bid(bidder, auctionSnapshot.highestBidPoints());
+            }
+            restoredAuction.restoreState(
+                    auctionSnapshot.currentPlayerIndex(),
+                    restoredHighestBid,
+                    auctionSnapshot.consecutivePasses(),
+                    auctionSnapshot.finished()
+            );
+            engine.auction = restoredAuction;
+        } else if (snapshot.phase() == GamePhase.BIDDING) {
             int startIdx = snapshot.roundNumber() > 0
                     ? (snapshot.roundNumber() - 1) % restoredPlayers.size()
                     : 0;

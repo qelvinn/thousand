@@ -22,6 +22,7 @@ import java.util.Objects;
  * @param talon карты прикупа
  * @param players состояние всех участников партии
  * @param roundPoints очки игроков за текущий раунд
+ * @param auction состояние текущей торговли или null
  * @param events журнал событий партии
  */
 public record GameSnapshot(
@@ -36,6 +37,7 @@ public record GameSnapshot(
         List<CardSnapshot> talon,
         List<PlayerSnapshot> players,
         Map<String, Integer> roundPoints,
+        AuctionSnapshot auction,
         List<String> events
 ) {
 
@@ -93,6 +95,36 @@ public record GameSnapshot(
                 throw new IllegalArgumentException("Имя игрока не может быть пустым");
             }
             hand = hand == null ? List.of() : List.copyOf(hand);
+        }
+    }
+
+    /**
+     * Представляет снимок состояния текущей торговли за прикуп.
+     *
+     * @param currentPlayerIndex индекс текущего игрока в торговле
+     * @param highestBidderName имя автора наибольшей ставки или null
+     * @param highestBidPoints размер наибольшей ставки или 0
+     * @param consecutivePasses количество подряд идущих пасов
+     * @param finished признак завершения торговли
+     */
+    public record AuctionSnapshot(
+            int currentPlayerIndex,
+            String highestBidderName,
+            int highestBidPoints,
+            int consecutivePasses,
+            boolean finished
+    ) {
+
+        /**
+         * Проверяет корректность полей снимка торговли.
+         */
+        public AuctionSnapshot {
+            if (currentPlayerIndex < 0) {
+                throw new IllegalArgumentException("Индекс текущего игрока не может быть отрицательным");
+            }
+            if (consecutivePasses < 0) {
+                throw new IllegalArgumentException("Количество пасов не может быть отрицательным");
+            }
         }
     }
 }
