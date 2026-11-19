@@ -83,7 +83,7 @@ public class MarriageEvaluatingBotStrategy implements PlayerStrategy {
     /**
      * Выбирает ставку на основе оценки руки с учётом марьяжей.
      *
-     * @param player игрок, делающий ход
+     * @param player            игрок, делающий ход
      * @param currentHighestBid текущая максимальная ставка или 0
      * @return следующая ставка или пустое значение для паса
      */
@@ -106,7 +106,7 @@ public class MarriageEvaluatingBotStrategy implements PlayerStrategy {
     /**
      * Сносит три наименее ценные карты, стараясь сохранить готовые и потенциальные марьяжи.
      *
-     * @param player заказчик раунда
+     * @param player   заказчик раунда
      * @param contract размер выигранного заказа
      * @return список из трёх карт для сноса
      */
@@ -126,10 +126,10 @@ public class MarriageEvaluatingBotStrategy implements PlayerStrategy {
     /**
      * Выбирает карту для розыгрыша с приоритетом дорогих марьяжей и взятия ценных взяток.
      *
-     * @param player игрок, совершающий ход
-     * @param trick текущая взятка
-     * @param trickNumber номер взятки в раунде
-     * @param trumpSuit текущий козырь
+     * @param player            игрок, совершающий ход
+     * @param trick             текущая взятка
+     * @param trickNumber       номер взятки в раунде
+     * @param trumpSuit         текущий козырь
      * @param declaredMarriages уже объявленные в раунде марьяжи
      * @return карта для хода
      */

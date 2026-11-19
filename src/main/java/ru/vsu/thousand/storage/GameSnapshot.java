@@ -11,19 +11,19 @@ import java.util.Objects;
 /**
  * Представляет полный снимок состояния игровой партии для сериализации в JSON.
  *
- * @param seed начальное значение генератора случайных чисел
- * @param roundNumber номер текущего раунда
- * @param phase текущая фаза партии
- * @param trumpSuit текущая козырная масть или null
+ * @param seed              начальное значение генератора случайных чисел
+ * @param roundNumber       номер текущего раунда
+ * @param phase             текущая фаза партии
+ * @param trumpSuit         текущая козырная масть или null
  * @param declaredMarriages масти объявленных в раунде марьяжей
- * @param declarerName имя заказчика текущего раунда или null
- * @param contract размер заказа текущего раунда
- * @param declarerPoints очки заказчика в текущем раунде
- * @param talon карты прикупа
- * @param players состояние всех участников партии
- * @param roundPoints очки игроков за текущий раунд
- * @param auction состояние текущей торговли или null
- * @param events журнал событий партии
+ * @param declarerName      имя заказчика текущего раунда или null
+ * @param contract          размер заказа текущего раунда
+ * @param declarerPoints    очки заказчика в текущем раунде
+ * @param talon             карты прикупа
+ * @param players           состояние всех участников партии
+ * @param roundPoints       очки игроков за текущий раунд
+ * @param auction           состояние текущей торговли или null
+ * @param events            журнал событий партии
  */
 public record GameSnapshot(
         long seed,
@@ -73,11 +73,11 @@ public record GameSnapshot(
     /**
      * Представляет снимок состояния отдельного игрока.
      *
-     * @param name имя игрока
-     * @param score общий счёт игрока
+     * @param name                       имя игрока
+     * @param score                      общий счёт игрока
      * @param consecutiveFailedContracts количество подряд невыполненных заказов
-     * @param bolts количество болтов
-     * @param hand карты на руке игрока
+     * @param bolts                      количество болтов
+     * @param hand                       карты на руке игрока
      */
     public record PlayerSnapshot(
             String name,
@@ -102,10 +102,10 @@ public record GameSnapshot(
      * Представляет снимок состояния текущей торговли за прикуп.
      *
      * @param currentPlayerIndex индекс текущего игрока в торговле
-     * @param highestBidderName имя автора наибольшей ставки или null
-     * @param highestBidPoints размер наибольшей ставки или 0
-     * @param consecutivePasses количество подряд идущих пасов
-     * @param finished признак завершения торговли
+     * @param highestBidderName  имя автора наибольшей ставки или null
+     * @param highestBidPoints   размер наибольшей ставки или 0
+     * @param consecutivePasses  количество подряд идущих пасов
+     * @param finished           признак завершения торговли
      */
     public record AuctionSnapshot(
             int currentPlayerIndex,

@@ -28,7 +28,7 @@ public class Auction {
     /**
      * Создаёт торговлю с указанным первым игроком.
      *
-     * @param players участники партии
+     * @param players             участники партии
      * @param startingPlayerIndex индекс первого игрока
      */
     public Auction(List<Player> players, int startingPlayerIndex) {
@@ -79,7 +79,9 @@ public class Auction {
         moveToNextPlayer();
     }
 
-    /** Фиксирует пас текущего игрока. */
+    /**
+     * Фиксирует пас текущего игрока.
+     */
     public void pass() {
         ensureActive();
 
@@ -96,9 +98,9 @@ public class Auction {
      * Восстанавливает внутреннее состояние торговли из сохранённого снимка.
      *
      * @param currentPlayerIndex индекс текущего игрока
-     * @param highestBid текущая максимальная ставка или null
-     * @param consecutivePasses количество подряд идущих пасов
-     * @param finished признак завершения торговли
+     * @param highestBid         текущая максимальная ставка или null
+     * @param consecutivePasses  количество подряд идущих пасов
+     * @param finished           признак завершения торговли
      */
     public void restoreState(
             int currentPlayerIndex,
@@ -121,34 +123,46 @@ public class Auction {
         this.finished = finished;
     }
 
-    /** @return индекс текущего игрока */
+    /**
+     * @return индекс текущего игрока
+     */
     public int getCurrentPlayerIndex() {
         return currentPlayerIndex;
     }
 
-    /** @return количество пасов подряд */
+    /**
+     * @return количество пасов подряд
+     */
     public int getConsecutivePasses() {
         return consecutivePasses;
     }
 
-    /** @return текущий игрок */
+    /**
+     * @return текущий игрок
+     */
     public Player getCurrentPlayer() {
         return players.get(currentPlayerIndex);
     }
 
-    /** @return наибольшая ставка или null */
+    /**
+     * @return наибольшая ставка или null
+     */
     public Bid getHighestBid() {
         return highestBid;
     }
 
-    /** @return победитель торговли или null */
+    /**
+     * @return победитель торговли или null
+     */
     public Player getWinner() {
         return highestBid == null
                 ? null
                 : highestBid.getPlayer();
     }
 
-    /** @return true, если торговля завершена */
+    /**
+     * @return true, если торговля завершена
+     */
     public boolean isFinished() {
         return finished;
     }

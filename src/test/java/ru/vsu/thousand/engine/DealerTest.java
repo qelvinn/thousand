@@ -90,6 +90,7 @@ class DealerTest {
                 () -> dealer.deal(players)
         );
     }
+
     @Test
     void shouldRejectNullPlayersList() {
         Dealer dealer = new Dealer(new GameSettings(123L));
@@ -114,6 +115,7 @@ class DealerTest {
                 () -> dealer.deal(players)
         );
     }
+
     @Test
     void shouldReturnUnmodifiableTalon() {
         List<Player> players = createPlayers();

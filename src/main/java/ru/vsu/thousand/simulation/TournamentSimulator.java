@@ -25,7 +25,9 @@ import java.util.stream.IntStream;
  */
 public class TournamentSimulator {
 
-    /** Стандартное количество партий для массовой симуляции. */
+    /**
+     * Стандартное количество партий для массовой симуляции.
+     */
     public static final int DEFAULT_GAMES_COUNT = 1000;
 
     private static final int MAX_STEPS_PER_GAME = 20000;
@@ -36,7 +38,7 @@ public class TournamentSimulator {
     /**
      * Создаёт симулятор для трёх участников с фабриками стратегий для каждого места.
      *
-     * @param playerNames имена трёх игроков
+     * @param playerNames       имена трёх игроков
      * @param strategyFactories фабрики создания экземпляров стратегий для каждого игрока
      */
     public TournamentSimulator(
@@ -65,7 +67,7 @@ public class TournamentSimulator {
      * Запускает серию партий последовательно в одном потоке.
      *
      * @param gamesCount количество партий
-     * @param baseSeed начальное значение генератора случайных чисел
+     * @param baseSeed   начальное значение генератора случайных чисел
      * @return агрегированная статистика по всем сыгранным партиям
      */
     public ContractStatistics runSequential(int gamesCount, long baseSeed) {
@@ -81,8 +83,8 @@ public class TournamentSimulator {
     /**
      * Запускает серию партий параллельно с использованием пула потоков.
      *
-     * @param gamesCount количество партий
-     * @param baseSeed начальное значение генератора случайных чисел
+     * @param gamesCount  количество партий
+     * @param baseSeed    начальное значение генератора случайных чисел
      * @param threadCount количество рабочих потоков
      * @return агрегированная статистика по всем сыгранным партиям
      */

@@ -95,6 +95,7 @@ class AuctionTest {
                 () -> new Auction(List.of(new Player("Игрок 1")))
         );
     }
+
     @Test
     void shouldResetPassesAfterNewBid() {
         List<Player> players = createPlayers();

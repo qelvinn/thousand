@@ -31,7 +31,7 @@ public class MarriageManager {
      * Объявляет марьяж указанной масти.
      *
      * @param player игрок, объявляющий марьяж
-     * @param suit масть марьяжа
+     * @param suit   масть марьяжа
      * @return количество начисляемых очков
      */
     public int declare(Player player, Suit suit) {
@@ -93,7 +93,9 @@ public class MarriageManager {
         }
     }
 
-    /** Сбрасывает объявленные марьяжи перед новым раундом. */
+    /**
+     * Сбрасывает объявленные марьяжи перед новым раундом.
+     */
     public void reset() {
         declaredMarriages.clear();
     }

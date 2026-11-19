@@ -8,15 +8,15 @@ import java.util.stream.Collectors;
 /**
  * Содержит агрегированную статистику по партиям и заказам в симуляции.
  *
- * @param totalGames количество сыгранных партий
- * @param totalContracts общее количество разыгранных заказов
- * @param successfulContracts количество выполненных заказов
- * @param failedContracts количество невыполненных заказов
- * @param averageContractSize средний размер заказа
- * @param winsByPlayer количество побед в партиях по именам игроков
- * @param contractsByPlayer количество сделанных заказов по именам игроков
+ * @param totalGames                  количество сыгранных партий
+ * @param totalContracts              общее количество разыгранных заказов
+ * @param successfulContracts         количество выполненных заказов
+ * @param failedContracts             количество невыполненных заказов
+ * @param averageContractSize         средний размер заказа
+ * @param winsByPlayer                количество побед в партиях по именам игроков
+ * @param contractsByPlayer           количество сделанных заказов по именам игроков
  * @param successfulContractsByPlayer количество выполненных заказов по именам игроков
- * @param contractSizeDistribution распределение количества заказов по их номиналам
+ * @param contractSizeDistribution    распределение количества заказов по их номиналам
  */
 public record ContractStatistics(
         int totalGames,
@@ -33,9 +33,9 @@ public record ContractStatistics(
     /**
      * Представляет запись об одном разыгранном заказе в раунде.
      *
-     * @param playerName имя заказчика
+     * @param playerName     имя заказчика
      * @param contractPoints размер заказа
-     * @param successful признак выполнения заказа
+     * @param successful     признак выполнения заказа
      */
     public record ContractRecord(
             String playerName,
@@ -59,10 +59,10 @@ public record ContractStatistics(
     /**
      * Представляет итог одной завершённой партии в симуляции.
      *
-     * @param gameIndex порядковый номер партии
-     * @param seed использованный seed партии
+     * @param gameIndex  порядковый номер партии
+     * @param seed       использованный seed партии
      * @param winnerName имя победителя партии
-     * @param contracts список всех разыгранных в партии заказов
+     * @param contracts  список всех разыгранных в партии заказов
      */
     public record GameOutcome(
             int gameIndex,

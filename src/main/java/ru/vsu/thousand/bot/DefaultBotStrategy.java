@@ -21,7 +21,7 @@ public class DefaultBotStrategy implements PlayerStrategy {
     /**
      * Делает минимальную ставку 100, если торги ещё не открыты, иначе пасует.
      *
-     * @param player игрок, делающий ход
+     * @param player            игрок, делающий ход
      * @param currentHighestBid текущая максимальная ставка
      * @return ставка 100 или пустое значение
      */
@@ -36,7 +36,7 @@ public class DefaultBotStrategy implements PlayerStrategy {
     /**
      * Сносит три младшие карты по достоинству и масти.
      *
-     * @param player заказчик раунда
+     * @param player   заказчик раунда
      * @param contract размер заказа
      * @return три младшие карты
      */
@@ -50,10 +50,10 @@ public class DefaultBotStrategy implements PlayerStrategy {
     /**
      * Выбирает карту по базовому правилу приоритета марьяжа и ответа в масть.
      *
-     * @param player игрок, совершающий ход
-     * @param trick текущая взятка
-     * @param trickNumber номер взятки
-     * @param trumpSuit текущий козырь
+     * @param player            игрок, совершающий ход
+     * @param trick             текущая взятка
+     * @param trickNumber       номер взятки
+     * @param trumpSuit         текущий козырь
      * @param declaredMarriages объявленные марьяжи
      * @return выбранная карта
      */

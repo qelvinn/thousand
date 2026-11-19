@@ -31,7 +31,7 @@ public class Dealer {
      * @param players список трёх игроков
      * @return список из трёх карт прикупа
      * @throws IllegalArgumentException если количество игроков не равно трём
-     * @throws IllegalStateException если у игроков уже есть карты
+     * @throws IllegalStateException    если у игроков уже есть карты
      */
     public List<Card> deal(List<Player> players) {
         Objects.requireNonNull(players);

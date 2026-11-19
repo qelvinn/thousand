@@ -57,7 +57,7 @@ public class GameEngine {
      * Создаёт игровой движок со стратегией по умолчанию для всех игроков.
      *
      * @param players три участника партии
-     * @param seed начальное значение генератора случайных чисел
+     * @param seed    начальное значение генератора случайных чисел
      */
     public GameEngine(List<Player> players, long seed) {
         this(players, seed, Map.of());
@@ -66,8 +66,8 @@ public class GameEngine {
     /**
      * Создаёт игровой движок с заданными стратегиями игроков.
      *
-     * @param players три участника партии
-     * @param seed начальное значение генератора случайных чисел
+     * @param players          три участника партии
+     * @param seed             начальное значение генератора случайных чисел
      * @param customStrategies карта стратегий для игроков
      */
     public GameEngine(
@@ -107,7 +107,9 @@ public class GameEngine {
         }
     }
 
-    /** Запускает новую партию. */
+    /**
+     * Запускает новую партию.
+     */
     public void start() {
         if (currentState != null) {
             throw new IllegalStateException("Партия уже запущена");
@@ -115,7 +117,9 @@ public class GameEngine {
         currentState = new InitializationState();
     }
 
-    /** Выполняет один шаг текущего состояния. */
+    /**
+     * Выполняет один шаг текущего состояния.
+     */
     public void runStep() {
         if (currentState == null) {
             throw new IllegalStateException("Сначала необходимо запустить партию");
@@ -152,7 +156,9 @@ public class GameEngine {
         }
     }
 
-    /** @return участники партии */
+    /**
+     * @return участники партии
+     */
     public List<Player> getPlayers() {
         return List.copyOf(players);
     }
@@ -172,37 +178,51 @@ public class GameEngine {
         return strategy;
     }
 
-    /** @return настройки партии */
+    /**
+     * @return настройки партии
+     */
     public GameSettings getSettings() {
         return settings;
     }
 
-    /** @return раздатчик карт */
+    /**
+     * @return раздатчик карт
+     */
     public Dealer getDealer() {
         return dealer;
     }
 
-    /** @return механизм обмена прикупа */
+    /**
+     * @return механизм обмена прикупа
+     */
     public TalonExchange getTalonExchange() {
         return talonExchange;
     }
 
-    /** @return текущий козырь */
+    /**
+     * @return текущий козырь
+     */
     public TrumpSuit getTrumpSuit() {
         return trumpSuit;
     }
 
-    /** @return менеджер марьяжей */
+    /**
+     * @return менеджер марьяжей
+     */
     public MarriageManager getMarriageManager() {
         return marriageManager;
     }
 
-    /** @return подсчёт очков */
+    /**
+     * @return подсчёт очков
+     */
     public RoundScorer getRoundScorer() {
         return roundScorer;
     }
 
-    /** @return карты прикупа */
+    /**
+     * @return карты прикупа
+     */
     public List<Card> getTalon() {
         return List.copyOf(talon);
     }
@@ -216,7 +236,9 @@ public class GameEngine {
         this.talon = List.copyOf(Objects.requireNonNull(talon));
     }
 
-    /** @return текущая торговля */
+    /**
+     * @return текущая торговля
+     */
     public Auction getAuction() {
         return auction;
     }
@@ -230,7 +252,9 @@ public class GameEngine {
         this.auction = Objects.requireNonNull(auction);
     }
 
-    /** @return заказчик раунда */
+    /**
+     * @return заказчик раунда
+     */
     public Player getDeclarer() {
         return declarer;
     }
@@ -244,7 +268,9 @@ public class GameEngine {
         this.declarer = Objects.requireNonNull(declarer);
     }
 
-    /** @return размер заказа */
+    /**
+     * @return размер заказа
+     */
     public int getContract() {
         return contract;
     }
@@ -274,7 +300,9 @@ public class GameEngine {
         roundPoints.put(declarer, points);
     }
 
-    /** @return очки заказчика за раунд */
+    /**
+     * @return очки заказчика за раунд
+     */
     public int getDeclarerPoints() {
         return declarerPoints;
     }
@@ -293,12 +321,16 @@ public class GameEngine {
         roundPoints.merge(player, points, Integer::sum);
     }
 
-    /** @return очки игроков за текущий раунд */
+    /**
+     * @return очки игроков за текущий раунд
+     */
     public Map<Player, Integer> getRoundPoints() {
         return Map.copyOf(roundPoints);
     }
 
-    /** Очищает очки текущего раунда. */
+    /**
+     * Очищает очки текущего раунда.
+     */
     public void resetRoundPoints() {
         for (Player player : players) {
             roundPoints.put(player, 0);
@@ -306,7 +338,9 @@ public class GameEngine {
         declarerPoints = 0;
     }
 
-    /** @return текущее состояние партии */
+    /**
+     * @return текущее состояние партии
+     */
     public GameState getCurrentState() {
         return currentState;
     }
@@ -320,7 +354,9 @@ public class GameEngine {
         currentState = Objects.requireNonNull(state);
     }
 
-    /** @return текущая фаза партии */
+    /**
+     * @return текущая фаза партии
+     */
     public GamePhase getPhase() {
         return currentState == null
                 ? GamePhase.INITIALIZATION
@@ -345,7 +381,9 @@ public class GameEngine {
         return gameLog.getEntries();
     }
 
-    /** @return победитель партии или null, если партия не завершена */
+    /**
+     * @return победитель партии или null, если партия не завершена
+     */
     public Player getWinner() {
         return players.stream()
                 .filter(player -> player.getScore() >= GameRules.WINNING_SCORE)
@@ -381,7 +419,9 @@ public class GameEngine {
         return roundNumber;
     }
 
-    /** Увеличивает номер раунда. */
+    /**
+     * Увеличивает номер раунда.
+     */
     public void advanceRound() {
         roundNumber++;
     }
@@ -455,7 +495,7 @@ public class GameEngine {
     /**
      * Восстанавливает игровой движок из сохранённого снимка состояния с пользовательскими стратегиями.
      *
-     * @param snapshot снимок состояния партии
+     * @param snapshot         снимок состояния партии
      * @param strategyResolver функция получения стратегии по восстановленному игроку
      * @return восстановленный экземпляр игрового движка
      */

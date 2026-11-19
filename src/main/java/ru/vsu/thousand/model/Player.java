@@ -137,10 +137,10 @@ public class Player {
     /**
      * Восстанавливает состояние игрока из сохранённых данных.
      *
-     * @param score общий счёт игрока
+     * @param score                      общий счёт игрока
      * @param consecutiveFailedContracts количество подряд невыполненных заказов
-     * @param bolts количество болтов
-     * @param cards карты на руке игрока
+     * @param bolts                      количество болтов
+     * @param cards                      карты на руке игрока
      */
     public void restoreState(
             int score,

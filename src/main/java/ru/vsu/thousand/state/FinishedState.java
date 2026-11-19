@@ -17,7 +17,9 @@ public class FinishedState implements GameState {
         gameEngine.addEvent("Партия завершена");
     }
 
-    /** @return финальная фаза партии */
+    /**
+     * @return финальная фаза партии
+     */
     @Override
     public GamePhase getPhase() {
         return GamePhase.FINISHED;

@@ -18,7 +18,7 @@ public class TalonExchange {
      * Передаёт карты прикупа победителю торговли.
      *
      * @param winner победитель торговли
-     * @param talon карты прикупа
+     * @param talon  карты прикупа
      */
     public void takeTalon(Player winner, List<Card> talon) {
         Objects.requireNonNull(winner);
@@ -47,7 +47,7 @@ public class TalonExchange {
     /**
      * Удаляет три выбранные карты из руки победителя торговли.
      *
-     * @param winner победитель торговли
+     * @param winner         победитель торговли
      * @param discardedCards карты, выбранные для сноса
      */
     public void discard(Player winner, List<Card> discardedCards) {

@@ -19,7 +19,7 @@ public class Trick {
      * Представляет карту, сыгранную конкретным игроком.
      *
      * @param player игрок, сыгравший карту
-     * @param card сыгранная карта
+     * @param card   сыгранная карта
      */
     public record PlayedCard(Player player, Card card) {
     }
@@ -32,9 +32,9 @@ public class Trick {
     /**
      * Создаёт взятку для трёх игроков.
      *
-     * @param players участники в порядке ходов
+     * @param players        участники в порядке ходов
      * @param startingPlayer игрок, который ходит первым
-     * @param trumpSuit текущий козырь
+     * @param trumpSuit      текущий козырь
      */
     public Trick(List<Player> players, Player startingPlayer, TrumpSuit trumpSuit) {
         Objects.requireNonNull(players);
@@ -74,8 +74,8 @@ public class Trick {
      * Разыгрывает карту текущего игрока.
      *
      * @param player игрок, совершающий ход
-     * @param card карта для розыгрыша
-     * @throws IllegalStateException если взятка завершена или сейчас ход другого игрока
+     * @param card   карта для розыгрыша
+     * @throws IllegalStateException    если взятка завершена или сейчас ход другого игрока
      * @throws IllegalArgumentException если карты нет на руке или нарушено правило масти
      */
     public void playCard(Player player, Card card) {

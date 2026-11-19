@@ -18,7 +18,9 @@ public class InitializationState implements GameState {
         gameEngine.setState(new DealingState());
     }
 
-    /** @return фаза инициализации */
+    /**
+     * @return фаза инициализации
+     */
     @Override
     public GamePhase getPhase() {
         return GamePhase.INITIALIZATION;
